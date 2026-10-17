@@ -90,6 +90,40 @@ Keep this terminal open. In Kali's browser, visit **http://127.0.0.1:5000/**. St
 
 A useful analyst note answers: **What happened? What evidence supports that assessment? What is still unknown? What should happen next?** Do not mark an alert malicious solely because a detection rule fired.
 
+## How the included alerts were prepared (beginner explanation)
+
+**Important:** The dashboard's three alerts are **preloaded synthetic examples**. They are not generated each time the Flask app starts, and they are not proof of attacks on a real network.
+
+Here is the data flow behind the published project:
+
+1. **Understand the detection source.** Suricata is a network intrusion detection system (IDS). It examines traffic and, when a configured rule matches, can write an alert event in **EVE JSON** format. An alert is a rule match, not automatically proof of malicious activity.
+2. **Prepare safe example evidence.** For this public portfolio, sample Suricata-format alert records were prepared as **synthetic training data**, rather than publishing private packet captures or original raw logs. The included files are `evidence/suricata-retest/eve.json` and `evidence/attack-tests/suricata-fixed/eve.json`. The exact original traffic-generation commands for every bundled synthetic record are **not documented**, so do not claim each one was recreated live.
+3. **Load the examples into the dashboard.** In `dashboard/app.py`, the `SOURCES` list points to those two files. The `load_alerts()` function reads each JSON line, keeps events where `event_type` is `alert`, and extracts the timestamp, rule signature, signature ID, severity, IPs, ports, and HTTP URI when present.
+4. **Give each alert a case identity.** The dashboard uses the evidence-file path and line number to identify an alert. This lets an analyst open and track a specific record.
+5. **Investigate and save decisions.** In `/alerts`, review the evidence. Open the case, choose **Investigating** and **Needs Investigation**, write your reasoning, and save. Case status, disposition, and notes are stored in a local SQLite database.
+6. **Explain what you know and do not know.** A rule firing means its conditions matched. Confirming an intrusion requires additional context and corroborating evidence.
+
+### Practice an investigation without generating any traffic
+
+After completing Steps 1–5 above:
+
+1. Open **http://127.0.0.1:5000/alerts** and select an existing sample alert.
+2. Read its **signature** (what the rule identified), **severity** (the rule's priority), **timestamp** (when the event is recorded), **source/destination** (where the traffic came from and went), and **URI** if shown.
+3. Ask: *Does this look suspicious? What information is missing? Could there be a benign explanation?*
+4. Open the case and set its status to **Investigating**. Keep the disposition as **Needs Investigation** unless the evidence supports a stronger conclusion.
+5. Write an analyst note, for example: `Reviewed Suricata signature and source/destination. Rule match observed; malicious intent not established. Next step: correlate with host and authentication logs.`
+6. Save and reopen the case to show that your analyst notes persist. Then visit **/investigations** to review case progress.
+
+### How to explain the project in an interview
+
+> "I built a local SOC analyst training dashboard using Flask, SQLite and Suricata-format EVE JSON evidence. The public repository contains three synthetic Suricata alerts, so another person can clone the project and reproduce the investigation workflow without generating attacks. The application parses the JSON records, shows alert metadata, and lets me document case status, disposition and notes in SQLite. I also separately tested how real Suricata alerts are produced: I created a custom HTTP detection rule, validated it, sent a harmless localhost request and confirmed a new event in an EVE JSON log. That live test is not automatically connected to the published dashboard."
+
+**Suggested 5–10 minute demonstration:** start the dashboard → show one sample alert → explain its fields → open the case and save an analyst note → show the investigation queue → explain the simulated capstone → show controlled validation results → describe the optional Suricata rule test below if asked how alerts are generated.
+
+**Interview question: "Did you generate these exact three alerts live?"** Answer: "No. The published dashboard uses three synthetic sample alerts for reproducible analyst training. I separately demonstrated real Suricata rule matching using a harmless localhost HTTP request."
+
+---
+
 ## Optional hands-on exercise: generate a NEW Suricata alert
 
 **This is separate from the default dashboard.** The three bundled alerts are preloaded examples. The following exercise creates a *fresh* alert from actual HTTP traffic on your own Kali machine, saved to a separate local EVE JSON log. **The fresh alert will not automatically appear in the Flask dashboard**; live-log ingestion is not part of the published default setup.
