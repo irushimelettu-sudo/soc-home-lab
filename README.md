@@ -32,3 +32,23 @@ Open http://127.0.0.1:5000/ . Use only on localhost; Flask's development server 
 ## Scope and provenance
 
 The dashboard was tested in the original Kali environment, including case update persistence using temporary SQLite copies. This repository includes *separate synthetic demo data* to support reproducibility; original packet captures, raw logs, full databases, and backups are not published. Some capstone and validation evidence is selected from the training exercise and must receive final human review before public upload.
+
+## Dashboard Screenshots
+
+The SOC Command dashboard uses synthetic demonstration data in this public repository.
+
+### SOC Command Center
+
+![SOC Command Center](screenshots/dashboard-overview.png)
+
+### Investigation Queue
+
+![Investigation Queue](screenshots/investigations.png)
+
+### Detection Quality
+
+![Detection Quality](screenshots/detection-quality.png)
+
+### Capstone Investigation
+
+![Capstone Investigation](screenshots/capstone-investigation.png)
