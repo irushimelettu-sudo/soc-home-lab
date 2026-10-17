@@ -147,65 +147,6 @@ The investigation page allows the event details to be reviewed and a case to be 
 
 Changes and analyst notes are stored locally in `dashboard/cases.db`. An alert alone does not establish that an attack succeeded; it needs supporting evidence.
 
-## Separate Suricata rule test
-
-The bundled dashboard alerts are synthetic. Suricata was also tested separately on Kali by generating a new alert from a harmless localhost HTTP request. **This separate event is not automatically imported into the published dashboard.**
-
-The test used a custom rule matching the URI `/soc-lab-test`.
-
-**1. Install and check Suricata:**
-
-```bash
-sudo apt install -y suricata curl
-suricata -V
-```
-
-**2. Create the rule:**
-
-```bash
-mkdir -p ~/soc-live-demo
-cat > ~/soc-live-demo/demo.rules <<'EOF'
-alert http any any -> any any (msg:"SOC LAB - Live HTTP Demo Alert"; flow:established,to_server; http.uri; content:"/soc-lab-test"; sid:1000001; rev:1;)
-EOF
-```
-
-**3. Validate the rule:**
-
-```bash
-sudo suricata -T -c /etc/suricata/suricata.yaml -S ~/soc-live-demo/demo.rules
-```
-
-**4. Start Suricata in the first terminal:**
-
-```bash
-sudo mkdir -p /var/log/suricata/soc-live-demo
-sudo suricata -c /etc/suricata/suricata.yaml -S ~/soc-live-demo/demo.rules -i lo -l /var/log/suricata/soc-live-demo
-```
-
-**5. Start a local web server in a second terminal:**
-
-```bash
-python3 -m http.server 8088 --bind 127.0.0.1
-```
-
-**6. Send a request in a third terminal:**
-
-```bash
-curl -v http://127.0.0.1:8088/soc-lab-test
-```
-
-The server may return HTTP 404, which is fine because the rule checks the request URI.
-
-**7. Check the Suricata log:**
-
-```bash
-sudo grep 'SOC LAB - Live HTTP Demo Alert' /var/log/suricata/soc-live-demo/eve.json
-```
-
-The matching request produced an alert in the local EVE JSON log. This demonstrates the basic sequence: network request → rule match → alert record. Stop Suricata and the web server with **Ctrl+C** in their respective terminals.
-
-The rule is stored in `~/soc-live-demo/demo.rules` and its log is stored in `/var/log/suricata/soc-live-demo/eve.json`. Neither location is part of the default dashboard's alert sources.
-
 ## Other lab components
 
 ### SSH and endpoint detections
