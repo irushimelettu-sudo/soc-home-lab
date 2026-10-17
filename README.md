@@ -52,3 +52,7 @@ The SOC Command dashboard uses synthetic demonstration data in this public repos
 ### Capstone Investigation
 
 ![Capstone Investigation](screenshots/capstone-investigation.png)
+
+### SOC Detection Queue
+
+![SOC Detection Queue](screenshots/soc-detection-queue.png)
