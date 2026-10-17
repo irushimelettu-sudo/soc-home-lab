@@ -35,7 +35,7 @@ The dashboard was tested in the original Kali environment, including case update
 
 ## Dashboard Screenshots
 
-The SOC Command dashboard uses synthetic demonstration data in this public repository.
+The SOC Command dashboard uses synthetic demonstration data.
 
 ### SOC Command Center
 
