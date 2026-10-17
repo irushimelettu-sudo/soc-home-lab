@@ -246,11 +246,45 @@ The `/quality` page presents results from ten controlled synthetic scenarios: th
 
 ![SOC detection queue](screenshots/soc-detection-queue.png)
 
+## Testing and validation
+
+### Dashboard smoke test
+
+Run this command from the project directory:
+
+```bash
+python3 tests/smoke_test.py
+```
+
+The test uses Flask's test client to check that these six routes return HTTP **200** (successful response): `/`, `/investigations`, `/quality`, `/alerts`, `/detections`, and `/capstone/CAPSTONE-001`. It also checks that the dashboard loads exactly **three synthetic Suricata alerts**.
+
+The smoke test checks basic functionality only. It does not test every user action or assess application security.
+
+### Investigation form and database checks
+
+During validation in the original Kali environment, the Suricata and Detection Staging investigation forms were tested by submitting updates (**POST**), checking that changes were saved in SQLite, and loading the case again (**GET**) to confirm that the saved values could be read back. Invalid case-status values were also checked for rejection.
+
+Those database checks used **isolated temporary SQLite copies** to avoid changing the demonstration databases. They are documented validation results, **not** additional checks performed by the current `tests/smoke_test.py` script.
+
+### Controlled detection results
+
+The detector-quality exercise covered ten synthetic scenarios:
+
+| Result | Count |
+| --- | ---: |
+| True positives | 3 |
+| True negatives | 7 |
+| False positives | 0 |
+| False negatives | 0 |
+
+These results apply only to the controlled scenarios and must not be interpreted as production detection accuracy.
+
 ## Notes and limitations
 
 - The dashboard is intended for local use at `127.0.0.1`; do not expose the Flask development server publicly.
 - The app does not implement production authentication or CSRF protection.
-- The published evidence and SQLite demonstration data are synthetic. Do not commit private logs, credentials, or real incident data.
+- The published evidence and SQLite demonstration databases are synthetic and intentionally included so the lab can be reproduced. Do not commit private logs, credentials, or real incident data.
+- Investigation updates are saved to local SQLite files. To reset them, restore the demo databases from Git **only if you do not need to keep your local changes**.
 - New Suricata events are not automatically ingested by the default dashboard.
-- The smoke test checks basic functionality, not overall application security.
+- The Flask development server is not suitable for production, and the documented checks are not a full security or end-to-end assessment.
 
