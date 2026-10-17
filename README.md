@@ -254,4 +254,3 @@ The `/quality` page presents results from ten controlled synthetic scenarios: th
 - New Suricata events are not automatically ingested by the default dashboard.
 - The smoke test checks basic functionality, not overall application security.
 
-Additional details are in [SETUP.md](SETUP.md) and [VALIDATION.md](VALIDATION.md).
