@@ -1,105 +1,48 @@
 # SOC Home Lab — SOC Command v3.1
 
-A local SOC investigation lab built on Kali Linux using Python, Flask, SQLite, and Suricata-format alert data. The project brings together network alert review, SSH and endpoint detection exercises, investigation tracking, and a simulated incident-response case.
+A beginner-friendly SOC (Security Operations Center) investigation lab built with Python Flask and SQLite. It runs locally on Kali Linux and provides sample security alerts to review, investigate, and document.
 
 ![SOC dashboard](screenshots/dashboard-overview.png)
 
-## Project overview
+## What the lab does
 
-The dashboard is designed to practice the workflow of reviewing security events and recording investigation decisions. It includes:
+A SOC analyst checks security alerts, reviews the available evidence, and records what happened and what needs further investigation. This lab provides a small dashboard to practice that process.
 
-- A dashboard overview and Suricata alert list
-- Alert details such as timestamp, signature, severity, source and destination addresses, and HTTP path
-- Case status, disposition, and analyst notes saved in SQLite
-- An investigation queue and separate SSH/endpoint detection examples
-- A simulated incident timeline and detection-quality results
+The current project includes:
 
-The published dashboard uses **three synthetic Suricata-format alerts**. They are stored in the repository so the application works without a running network sensor. This is a training environment, not a live SIEM.
+- **Dashboard overview:** a summary of the training environment.
+- **Suricata alerts (`/alerts`):** three preloaded sample network alerts with timestamps, IP addresses, signatures, severity, and HTTP paths.
+- **Alert investigations:** case status, disposition, and analyst notes saved to a local SQLite database.
+- **Investigation queue (`/investigations`):** a place to review and filter investigation cases.
+- **SSH and endpoint exercises (`/detections`):** separate training cases for host and authentication activity.
+- **Incident capstone (`/capstone/CAPSTONE-001`):** a simulated investigation with a timeline and evidence.
+- **Detection quality (`/quality`):** results from ten controlled synthetic test scenarios.
 
-## Requirements
+**Important:** The three Suricata alerts are synthetic training data included in the repository. The Flask dashboard does not capture live network traffic or automatically generate new alerts. It is an investigation lab, not a live SIEM.
 
-- Kali Linux (or another Linux system with Python 3)
-- Git
-- Python 3.10 or newer and Python virtual environment support
-- A web browser
+## How the included alerts were created
 
-## Installation and running the dashboard
+### 1. Preparing the example events
 
-**1. Install the required tools on Kali:**
+Suricata is a network intrusion detection system (IDS). It normally writes detected events to an **EVE JSON** log, with one JSON object per line.
 
-```bash
-sudo apt update
-sudo apt install -y git python3 python3-venv python3-pip
-```
+For this lab, three **synthetic examples** were prepared in the same JSON structure so they could be used for repeatable investigations without requiring live traffic.
 
-**2. Clone the repository:**
+The repository contains these completed records, but it does **not** document the original commands used to write each one. They should therefore be described as prepared sample events, not as alerts proven to have come from a packet capture or real attack.
 
-```bash
-cd ~
-git clone https://github.com/irushimelettu-sudo/soc-home-lab.git
-cd soc-home-lab
-```
+### 2. The three alerts
 
-If the repository is already cloned, run `cd ~/soc-home-lab` instead.
+| Sample alert | HTTP path | File |
+| --- | --- | --- |
+| Possible diagnostic script request | `/diag.sh` | `evidence/suricata-retest/eve.json` |
+| HTTP unusual user agent | `/status` | `evidence/suricata-retest/eve.json` |
+| Suspicious path probe | `/admin` | `evidence/attack-tests/suricata-fixed/eve.json` |
 
-**3. Set up Python:**
+The first file contains two events; the second contains one. All three are already present when you clone the repository.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+### 3. What an alert looks like
 
-**4. Check that the application works:**
-
-```bash
-python3 tests/smoke_test.py
-```
-
-The test checks six dashboard routes and confirms that the three bundled Suricata alerts can be loaded.
-
-**5. Start the dashboard:**
-
-```bash
-python3 dashboard/app.py
-```
-
-Open **http://127.0.0.1:5000/** in the Kali browser. Keep the terminal running while using the application. Press **Ctrl+C** to stop the server.
-
-## How the alert data was created and used
-
-Suricata is a network intrusion detection system. When traffic matches a detection rule, Suricata can record an event in its EVE JSON log. An EVE JSON file contains one JSON event per line.
-
-For the public version of this lab, the three dashboard alerts are **synthetic example records** written in Suricata's EVE JSON structure. This keeps the exercise reproducible and avoids including original raw traffic or private logs. The repository contains the finished records; it does not contain a complete record of the original commands used to author each synthetic example.
-
-### 1. The alert records
-
-Two events are stored in:
-
-```text
-evidence/suricata-retest/eve.json
-```
-
-They represent:
-
-- `LAB DEMO Possible diagnostic script request` — HTTP request for `/diag.sh`
-- `LAB DEMO HTTP unusual user agent` — HTTP request for `/status`
-
-One event is stored in:
-
-```text
-evidence/attack-tests/suricata-fixed/eve.json
-```
-
-It represents:
-
-- `LAB DEMO Suspicious path probe` — HTTP request for `/admin`
-
-These are sample detection scenarios, not confirmed intrusions.
-
-### 2. Structure of an alert
-
-This is one of the synthetic events included in the project, formatted for readability:
+This is the `/admin` sample event from the project, formatted over several lines for readability:
 
 ```json
 {
@@ -122,11 +65,19 @@ This is one of the synthetic events included in the project, formatted for reada
 }
 ```
 
-The `timestamp` records the event time, `src_ip` and `dest_ip` identify the endpoints, `signature` names the detection, `severity` gives its assigned priority, and `http.url` records the requested path. The IP addresses used in the samples are documentation addresses.
+- `timestamp`: the recorded event time.
+- `event_type`: `alert` tells the application this is an alert event.
+- `src_ip` and `dest_ip`: the source and destination IP addresses.
+- `src_port` and `dest_port`: the connection ports.
+- `alert.signature`: the name of the example detection.
+- `alert.severity`: the assigned alert severity.
+- `http.url`: the requested web path.
 
-### 3. Loading the records into Flask
+The IP addresses are reserved documentation addresses. The event is not proof that a real system was attacked.
 
-In `dashboard/app.py`, the application points to the two evidence files:
+### 4. How the dashboard reads the alerts
+
+The `dashboard/app.py` file points to the two evidence files:
 
 ```python
 SOURCES = [
@@ -135,43 +86,95 @@ SOURCES = [
 ]
 ```
 
-The `load_alerts()` function reads each JSON line and selects events with `event_type` set to `alert`. It extracts the relevant fields, assigns an ID based on the source file and line number, and sorts the alerts by timestamp.
+When the dashboard loads alerts:
 
-The `enrich_alerts()` function then adds any saved case status, disposition, and notes from the local SQLite database.
+1. `load_alerts()` opens both files and reads each JSON line.
+2. It keeps events with `event_type` equal to `alert`.
+3. It extracts the timestamp, signature, severity, source and destination, and HTTP path.
+4. It assigns each alert an ID using its file path and line number.
+5. `enrich_alerts()` adds saved case status, disposition, and notes from SQLite.
+6. The browser displays the alerts on the `/alerts` page.
 
-### 4. Reviewing an alert
+The JSON files provide the alert evidence; SQLite stores the analyst's investigation updates.
 
-After starting the dashboard, open **http://127.0.0.1:5000/alerts** and select an alert.
+## How to set up and run the lab on Kali Linux
 
-The investigation page allows the event details to be reviewed and a case to be updated. The available statuses are **New**, **Investigating**, and **Closed**. Dispositions include **Needs Investigation**, **True Positive**, **False Positive**, and **Benign True Positive**.
+### Step 1 — Install the basic tools
 
-Changes and analyst notes are stored locally in `dashboard/cases.db`. An alert alone does not establish that an attack succeeded; it needs supporting evidence.
+Open a Kali terminal:
 
-## Other lab components
+```bash
+sudo apt update
+sudo apt install -y git python3 python3-venv python3-pip
+```
 
-### SSH and endpoint detections
+### Step 2 — Download the project
 
-The `/detections` page contains separate detection exercises for reviewing host and authentication-related activity and documenting case decisions.
+```bash
+cd ~
+git clone https://github.com/irushimelettu-sudo/soc-home-lab.git
+cd soc-home-lab
+```
 
-### Investigation queue
+If you already downloaded it, use `cd ~/soc-home-lab` instead.
 
-The `/investigations` page brings together tracked investigation cases and provides filtering by status and severity.
+### Step 3 — Install the Python dependency
 
-### Incident-response capstone
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-The `/capstone/CAPSTONE-001` page presents a simulated SSH-related investigation timeline, including login activity and subsequent commands. The available evidence does **not** confirm compromise or script execution.
+The virtual environment keeps the project's Python packages separate from the rest of Kali. The requirements file installs Flask.
 
-### Detection quality
+### Step 4 — Check the installation
 
-The `/quality` page presents results from ten controlled synthetic scenarios: three true positives, seven true negatives, zero false positives, and zero false negatives. These figures describe that exercise only, not production detection accuracy.
+```bash
+python3 tests/smoke_test.py
+```
+
+The test checks that six dashboard pages respond successfully and that all **three synthetic Suricata alerts** load. It should finish with `[COMPLETE] Standalone smoke test passed`.
+
+### Step 5 — Start the dashboard
+
+```bash
+python3 dashboard/app.py
+```
+
+Leave this terminal running and open the following address in Kali's browser:
+
+**http://127.0.0.1:5000/**
+
+Press **Ctrl+C** in the terminal to stop the dashboard.
+
+## How to use the lab
+
+1. Open the dashboard at `http://127.0.0.1:5000/`.
+2. Go to **Alerts** (`/alerts`) to see the three sample Suricata events.
+3. Open an alert and read its signature, timestamp, severity, source/destination, and HTTP path.
+4. Open the alert's investigation and update its **status**, **disposition**, and **notes**. Statuses include New, Investigating, and Closed.
+5. Save the case. The update is stored in the local SQLite database (`dashboard/cases.db`).
+6. Visit **Investigations** (`/investigations`) to review tracked cases.
+7. Explore **Detections**, **Capstone**, and **Quality** for the other included training exercises.
+
+For example, the `/admin` alert represents a request to an administrative web path. That path can be suspicious, but the alert alone does not prove a compromise. The purpose of the investigation is to record the available evidence and what else would need to be checked.
+
+## Testing and limitations
+
+The included `tests/smoke_test.py` checks six routes and the three sample alerts. During separate validation on Kali, investigation-form updates, SQLite persistence, reading saved changes, and rejection of invalid status values were also checked using temporary database copies.
+
+The detection-quality exercise contains **10 synthetic scenarios**: 3 true positives, 7 true negatives, 0 false positives, and 0 false negatives. These results are specific to the training exercise, not a measure of real-world accuracy.
+
+This is a **local educational project**. It has no production authentication or CSRF protection and should not be exposed to the internet. The simulated capstone does not confirm compromise or script execution. New Suricata events are not automatically imported into the dashboard.
 
 ## Screenshots
 
-### Dashboard overview
+### Dashboard
 
 ![Dashboard overview](screenshots/dashboard-overview.png)
 
-### Investigation queue
+### Investigations
 
 ![Investigation queue](screenshots/investigations.png)
 
@@ -179,53 +182,10 @@ The `/quality` page presents results from ten controlled synthetic scenarios: th
 
 ![Detection quality](screenshots/detection-quality.png)
 
-### Capstone investigation
+### Capstone
 
 ![Capstone investigation](screenshots/capstone-investigation.png)
 
-### SOC detection queue
+### Detection queue
 
 ![SOC detection queue](screenshots/soc-detection-queue.png)
-
-## Testing and validation
-
-### Dashboard smoke test
-
-Run this command from the project directory:
-
-```bash
-python3 tests/smoke_test.py
-```
-
-The test uses Flask's test client to check that these six routes return HTTP **200** (successful response): `/`, `/investigations`, `/quality`, `/alerts`, `/detections`, and `/capstone/CAPSTONE-001`. It also checks that the dashboard loads exactly **three synthetic Suricata alerts**.
-
-The smoke test checks basic functionality only. It does not test every user action or assess application security.
-
-### Investigation form and database checks
-
-During validation in the original Kali environment, the Suricata and Detection Staging investigation forms were tested by submitting updates (**POST**), checking that changes were saved in SQLite, and loading the case again (**GET**) to confirm that the saved values could be read back. Invalid case-status values were also checked for rejection.
-
-Those database checks used **isolated temporary SQLite copies** to avoid changing the demonstration databases. They are documented validation results, **not** additional checks performed by the current `tests/smoke_test.py` script.
-
-### Controlled detection results
-
-The detector-quality exercise covered ten synthetic scenarios:
-
-| Result | Count |
-| --- | ---: |
-| True positives | 3 |
-| True negatives | 7 |
-| False positives | 0 |
-| False negatives | 0 |
-
-These results apply only to the controlled scenarios and must not be interpreted as production detection accuracy.
-
-## Notes and limitations
-
-- The dashboard is intended for local use at `127.0.0.1`; do not expose the Flask development server publicly.
-- The app does not implement production authentication or CSRF protection.
-- The published evidence and SQLite demonstration databases are synthetic and intentionally included so the lab can be reproduced. Do not commit private logs, credentials, or real incident data.
-- Investigation updates are saved to local SQLite files. To reset them, restore the demo databases from Git **only if you do not need to keep your local changes**.
-- New Suricata events are not automatically ingested by the default dashboard.
-- The Flask development server is not suitable for production, and the documented checks are not a full security or end-to-end assessment.
-
