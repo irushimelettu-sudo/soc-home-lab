@@ -1,0 +1,34 @@
+# SOC Home Lab — SOC Command v3.1
+
+A Kali Linux / VirtualBox SOC analyst training project comprising twelve exercises and a simulated incident-response capstone. The dashboard uses Flask, SQLite, Suricata EVE alert records, SSH/endpoint detection staging, and controlled detector validation.
+
+## What is included
+
+- `dashboard/`: SOC Command source and investigation workflow
+- `evidence/`: **synthetic demo** Suricata EVE records and detection staging SQLite database
+- `dashboard/cases.db`: **synthetic demo** Suricata case decisions
+- `capstone/`: selected training investigation evidence and report
+- `validation/`: controlled detector-quality results
+- `tests/`: standalone demo smoke test
+
+The demo cases are **not** copies of original lab databases. The capstone is a simulation: compromise and script execution were **not confirmed**. The 3 TP / 7 TN / 0 FP / 0 FN results describe ten controlled test scenarios only, not real-world accuracy.
+
+## Run locally
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 tests/smoke_test.py
+python3 dashboard/app.py
+```
+
+Open http://127.0.0.1:5000/ . Use only on localhost; Flask's development server is not for production.
+
+## Training topics
+
+01 SSH investigation; 02 auditd/endpoint; 03 Suricata and PCAP; 04 Flask dashboard (developed inside Lab 03); 05 timeline; 06 detection staging; 07 endpoint investigation; 08 dashboard enhancement; 09 Suricata correlation; 10 PCAP threat hunting; 11 incident response; 12 detector-quality validation.
+
+## Scope and provenance
+
+The dashboard was tested in the original Kali environment, including case update persistence using temporary SQLite copies. This repository includes *separate synthetic demo data* to support reproducibility; original packet captures, raw logs, full databases, and backups are not published. Some capstone and validation evidence is selected from the training exercise and must receive final human review before public upload.

@@ -1,0 +1,83 @@
+{
+  "summary": {
+    "true_positives": 3,
+    "false_positives": 0,
+    "true_negatives": 7,
+    "false_negatives": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "false_positive_rate": 0.0
+  },
+  "scenarios": [
+    {
+      "scenario": "Complete attack sequence",
+      "expected_detection": true,
+      "actual_detection": true,
+      "outcome": "TP",
+      "error": null
+    },
+    {
+      "scenario": "Fast attack sequence",
+      "expected_detection": true,
+      "actual_detection": true,
+      "outcome": "TP",
+      "error": null
+    },
+    {
+      "scenario": "Boundary at 60 seconds",
+      "expected_detection": true,
+      "actual_detection": true,
+      "outcome": "TP",
+      "error": null
+    },
+    {
+      "scenario": "Benign probe only",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    },
+    {
+      "scenario": "Traversal without reconnaissance",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    },
+    {
+      "scenario": "Wrong event order",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    },
+    {
+      "scenario": "Different source addresses",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    },
+    {
+      "scenario": "Different destination addresses",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    },
+    {
+      "scenario": "Sequence exceeds 60 seconds",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    },
+    {
+      "scenario": "Unrecognized signatures",
+      "expected_detection": false,
+      "actual_detection": false,
+      "outcome": "TN",
+      "error": null
+    }
+  ]
+}

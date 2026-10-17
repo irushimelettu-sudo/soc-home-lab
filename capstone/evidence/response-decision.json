@@ -1,0 +1,14 @@
+{
+  "case_id": "CAPSTONE-001",
+  "decision_time_utc": "2026-10-17T17:31:44.518712+00:00",
+  "severity": "High - provisional",
+  "classification": "Suspected account compromise",
+  "confidence": "Moderate",
+  "escalation": "Escalate to incident response",
+  "host_isolation": "Not performed - simulated case",
+  "credential_action": "Validate deploy login authorization; consider revocation or reset if unauthorized access is confirmed",
+  "confirmed_compromise": false,
+  "confirmed_script_execution": false,
+  "confirmed_exfiltration": false,
+  "case_status": "Exercise Complete - Findings Escalated"
+}
